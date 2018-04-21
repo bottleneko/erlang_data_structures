@@ -1,0 +1,10 @@
+{application, erlang_data_structures,
+ [{description, "Erlang algorithms library"},
+  {vsn, "0.1.0"},
+  {applications,
+   [kernel,
+    stdlib
+   ]},
+  {modules, [binary_heap]},
+  {licenses, ["MIT"]}
+ ]}.
