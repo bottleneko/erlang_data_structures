@@ -27,7 +27,7 @@ to_list(Heap) ->
       {Min, NewHeap} = binary_heap:extract_min(CurrentHeap),
       {[Min|Acc], NewHeap}
     end, {[], Heap}, lists:seq(1, binary_heap:size(Heap))),
-  List.
+  lists:reverse(List).
 
 insert(Elem, #binary_heap{
   size = OldSize,

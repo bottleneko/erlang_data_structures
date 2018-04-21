@@ -51,8 +51,8 @@ to_list_test(_Config) ->
   TestList = [1,3,2,4,6,5],
   SortedList = lists:sort(TestList),
   Heap = binary_heap:from_list(TestList),
-  HeapMinimums = binary_heap:from_list(Heap),
-  ?assertEqual(SortedList, lists:reverse(HeapMinimums)).
+  HeapMinimums = binary_heap:to_list(Heap),
+  ?assertEqual(SortedList, HeapMinimums).
 
 size_test(_Config) ->
   ?assertEqual(1, binary_heap:size(binary_heap:from_list([1]))),
