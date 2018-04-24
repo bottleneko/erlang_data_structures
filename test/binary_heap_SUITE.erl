@@ -8,6 +8,7 @@
 
 all() ->
   [
+    empty_heap_test,
     new_identity_test,
     heap_property_test,
     from_list_test,
@@ -15,6 +16,9 @@ all() ->
     size_test,
     merge_test
   ].
+
+empty_heap_test(_Config) ->
+  ?assertEqual(undefined, binary_heap:peek(binary_heap:new())).
 
 new_identity_test(_Config) ->
   ?assertEqual(binary_heap:new(), binary_heap:new()),
@@ -31,7 +35,7 @@ heap_property_test(_Config) ->
     end, binary_heap:new(), TestList),
   {HeapMinimums, _} = lists:foldl(
     fun(_, {Acc, CurrentHeap}) ->
-      {Min, NewHeap} = binary_heap:extract_min(CurrentHeap),
+      {Min, NewHeap} = binary_heap:extract_peek(CurrentHeap),
       {[Min|Acc], NewHeap}
     end, {[], Heap}, lists:seq(1, binary_heap:size(Heap))),
   ?assertEqual(SortedList, lists:reverse(HeapMinimums)).
@@ -42,7 +46,7 @@ from_list_test(_Config) ->
   Heap = binary_heap:from_list(TestList),
   {HeapMinimums, _} = lists:foldl(
     fun(_, {Acc, CurrentHeap}) ->
-      {Min, NewHeap} = binary_heap:extract_min(CurrentHeap),
+      {Min, NewHeap} = binary_heap:extract_peek(CurrentHeap),
       {[Min|Acc], NewHeap}
     end, {[], Heap}, lists:seq(1, binary_heap:size(Heap))),
   ?assertEqual(SortedList, lists:reverse(HeapMinimums)).
@@ -67,7 +71,7 @@ merge_test(_Config) ->
   FinalHeap = binary_heap:merge(FirstMergedHeap, ThirdHeap),
   {HeapMinimums, _} = lists:foldl(
     fun(_, {Acc, CurrentHeap}) ->
-      {Min, NewHeap} = binary_heap:extract_min(CurrentHeap),
+      {Min, NewHeap} = binary_heap:extract_peek(CurrentHeap),
       {[Min|Acc], NewHeap}
     end, {[], FinalHeap}, lists:seq(1, binary_heap:size(FinalHeap))),
   ?assertEqual(lists:seq(1, 9), lists:reverse(HeapMinimums)).

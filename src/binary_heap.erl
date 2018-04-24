@@ -7,7 +7,8 @@
   from_list/1,
   to_list/1,
   insert/2,
-  extract_min/1,
+  extract_peek/1,
+  peek/1,
   size/1,
   merge/2]).
 
@@ -24,7 +25,7 @@ from_list(List) ->
 to_list(Heap) ->
   {List, _} = lists:foldl(
     fun(_, {Acc, CurrentHeap}) ->
-      {Min, NewHeap} = binary_heap:extract_min(CurrentHeap),
+      {Min, NewHeap} = binary_heap:extract_peek(CurrentHeap),
       {[Min|Acc], NewHeap}
     end, {[], Heap}, lists:seq(1, binary_heap:size(Heap))),
   lists:reverse(List).
@@ -37,13 +38,16 @@ insert(Elem, #binary_heap{
     container = array:set(OldSize, Elem, OldContainer)},
   sift_up(NewHeap, OldSize).
 
-extract_min(#binary_heap{
+extract_peek(#binary_heap{
   size = Size,
   container = Container}) ->
-  Min = array:get(0, Container),
+  Peek = array:get(0, Container),
   NewArray = array:set(0, array:get(Size - 1, Container), Container),
   NewHeap = sift_down(#binary_heap{size = Size - 1, container = NewArray}, 0),
-  {Min, NewHeap}.
+  {Peek, NewHeap}.
+
+peek(#binary_heap{container = Container}) ->
+  array:get(0, Container).
 
 size(#binary_heap{size = Size}) -> Size.
 
