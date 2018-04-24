@@ -4,46 +4,59 @@
 
 -export([
   new/0,
+  new/1,
   from_list/1,
   to_list/1,
   insert/2,
-  extract_min/1,
+  extract_peek/1,
+  peek/1,
   size/1,
   merge/2]).
+
+-define(DEFAULT_COMPARATOR, fun(A, B) -> A < B end).
 
 %%====================================================================
 %% API functions
 %%====================================================================
 
 new() ->
-  #binary_heap{size = 0, container = array:new()}.
+  #binary_heap{size = 0, container = array:new(), comparator = ?DEFAULT_COMPARATOR}.
+
+new(Comparator) ->
+  #binary_heap{size = 0, container = array:new(), comparator = Comparator}.
 
 from_list(List) ->
-  heapify(#binary_heap{size = length(List), container = array:from_list(List)}).
+  heapify(#binary_heap{size = length(List), container = array:from_list(List), comparator = ?DEFAULT_COMPARATOR}).
 
 to_list(Heap) ->
   {List, _} = lists:foldl(
     fun(_, {Acc, CurrentHeap}) ->
-      {Min, NewHeap} = binary_heap:extract_min(CurrentHeap),
+      {Min, NewHeap} = binary_heap:extract_peek(CurrentHeap),
       {[Min|Acc], NewHeap}
     end, {[], Heap}, lists:seq(1, binary_heap:size(Heap))),
   lists:reverse(List).
 
 insert(Elem, #binary_heap{
   size = OldSize,
-  container = OldContainer}) ->
+  container = OldContainer,
+  comparator = Comparator}) ->
   NewHeap = #binary_heap{
     size = OldSize + 1,
-    container = array:set(OldSize, Elem, OldContainer)},
+    container = array:set(OldSize, Elem, OldContainer),
+    comparator = Comparator},
   sift_up(NewHeap, OldSize).
 
-extract_min(#binary_heap{
+extract_peek(#binary_heap{
   size = Size,
-  container = Container}) ->
-  Min = array:get(0, Container),
+  container = Container,
+  comparator = Comparator}) ->
+  Peek = array:get(0, Container),
   NewArray = array:set(0, array:get(Size - 1, Container), Container),
-  NewHeap = sift_down(#binary_heap{size = Size - 1, container = NewArray}, 0),
-  {Min, NewHeap}.
+  NewHeap = sift_down(#binary_heap{size = Size - 1, container = NewArray, comparator = Comparator}, 0),
+  {Peek, NewHeap}.
+
+peek(#binary_heap{container = Container}) ->
+  array:get(0, Container).
 
 size(#binary_heap{size = Size}) -> Size.
 
@@ -54,22 +67,22 @@ merge(FirstHeap = #binary_heap{size = FirstSize},
     lists:seq(0, SecondSize - 1)
   ),
   lists:foldl(
-    fun({FirstIndex, SecondIndex}, #binary_heap{size = HeapSize, container = HeapContainer}) ->
+    fun({FirstIndex, SecondIndex}, #binary_heap{size = HeapSize, container = HeapContainer, comparator = Comparator}) ->
       heapify(#binary_heap{
         size = HeapSize + 1,
-        container = array:set(FirstIndex, array:get(SecondIndex, SecondContainer), HeapContainer
-        )})
+        container = array:set(FirstIndex, array:get(SecondIndex, SecondContainer), HeapContainer),
+        comparator = Comparator})
     end, FirstHeap, Indexes).
 
 %%====================================================================
 %% Internal functions
 %%====================================================================
 
-sift_up(Heap = #binary_heap{container = Container}, Index) ->
+sift_up(Heap = #binary_heap{container = Container, comparator = Comparator}, Index) ->
   {_, NewContainer} = lists:foldl(
       fun
         ({CurrentInd, ParentInd}, {false, Array}) ->
-          case array:get(CurrentInd, Array) < array:get(ParentInd, Array) of
+          case Comparator(array:get(CurrentInd, Array), array:get(ParentInd, Array)) of
             true ->
               {false, swap(CurrentInd, ParentInd, Array)};
             false ->
@@ -80,21 +93,21 @@ sift_up(Heap = #binary_heap{container = Container}, Index) ->
       end, {false, Container}, sift_up_seq(Index)),
   Heap#binary_heap{container = NewContainer}.
 
-sift_down(Heap = #binary_heap{size = Size, container = Container}, Index) when Index*2 + 1 < Size->
+sift_down(Heap = #binary_heap{size = Size, container = Container, comparator = Comparator}, Index) when Index*2 + 1 < Size->
   Left = Index*2 + 1,
   Right = Index*2 + 2,
   Branch =
     case Right < Size andalso
-      array:get(Left, Container) > array:get(Right, Container) of
+      Comparator(array:get(Right, Container), array:get(Left, Container)) of
       true ->
         Right;
       false ->
         Left
     end,
-  case array:get(Index, Container) =< array:get(Branch, Container) of
-    true ->
-      Heap;
+  case Comparator(array:get(Branch, Container), array:get(Index, Container)) of
     false ->
+      Heap;
+    true ->
       NewContainer = swap(Index, Branch, Container),
       sift_down(Heap#binary_heap{container = NewContainer}, Branch)
   end;
@@ -104,7 +117,7 @@ heapify(Heap = #binary_heap{size = Size}) ->
   lists:foldl(
     fun(Elem, CurrentHeap) ->
       sift_down(CurrentHeap, Elem)
-    end,Heap, lists:seq(Size div 2, 0, -1)).
+    end, Heap, lists:seq(Size div 2, 0, -1)).
 
 sift_up_seq(Index) ->
   sift_up_seq_T(Index, (Index - 1) div 2, []).
