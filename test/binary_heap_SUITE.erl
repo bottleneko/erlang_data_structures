@@ -11,6 +11,7 @@ all() ->
     empty_heap_test,
     new_identity_test,
     heap_property_test,
+    desc_order_heap_property_test,
     from_list_test,
     to_list_test,
     size_test,
@@ -39,6 +40,21 @@ heap_property_test(_Config) ->
       {[Min|Acc], NewHeap}
     end, {[], Heap}, lists:seq(1, binary_heap:size(Heap))),
   ?assertEqual(SortedList, lists:reverse(HeapMinimums)).
+
+desc_order_heap_property_test(_Config) ->
+  TestList = [1,3,2,4,6,5],
+  SortedList = lists:sort(TestList),
+  Heap = lists:foldl(
+    fun(Elem, Heap) ->
+      binary_heap:insert(Elem, Heap)
+    end, binary_heap:new(fun(A, B) -> A > B end), TestList),
+  {HeapMinimums, _} = lists:foldl(
+    fun(_, {Acc, CurrentHeap}) ->
+      {Min, NewHeap} = binary_heap:extract_peek(CurrentHeap),
+      {[Min|Acc], NewHeap}
+    end, {[], Heap}, lists:seq(1, binary_heap:size(Heap))),
+  ?assertEqual(lists:reverse(SortedList), lists:reverse(HeapMinimums)).
+
 
 from_list_test(_Config) ->
   TestList = [1,3,2,4,6,5],

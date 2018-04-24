@@ -4,6 +4,7 @@
 
 -export([
   new/0,
+  new/1,
   from_list/1,
   to_list/1,
   insert/2,
@@ -20,6 +21,9 @@
 
 new() ->
   #binary_heap{size = 0, container = array:new(), comparator = ?DEFAULT_COMPARATOR}.
+
+new(Comparator) ->
+  #binary_heap{size = 0, container = array:new(), comparator = Comparator}.
 
 from_list(List) ->
   heapify(#binary_heap{size = length(List), container = array:from_list(List), comparator = ?DEFAULT_COMPARATOR}).
