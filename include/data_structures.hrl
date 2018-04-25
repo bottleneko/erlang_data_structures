@@ -3,3 +3,10 @@
   container,
   comparator
 }).
+
+-record(binary_tree, {
+  size,
+  value,
+  left,
+  right
+}).
