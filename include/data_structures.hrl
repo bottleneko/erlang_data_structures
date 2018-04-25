@@ -10,3 +10,7 @@
   left,
   right
 }).
+
+-record(directred_graph, {
+  container
+}).
