@@ -1,6 +1,11 @@
 -module(directed_graph).
 
--export([new/0, add_edge/2, to_list/1]).
+-export([
+  new/0,
+  add_edge/2,
+  to_list/1,
+  from_list/1
+]).
 
 -include("data_structures.hrl").
 
@@ -21,3 +26,17 @@ to_list(#directred_graph{container = Tid}) ->
     fun({From, To}) ->
       lists:foldl(fun(Elem, Acc) -> [{From, Elem}|Acc] end, [], To)
     end, ets:tab2list(Tid)).
+
+from_list(List) ->
+  Graph = lists:foldl(
+    fun({From, To}, Acc) ->
+      Graph = Acc#directred_graph.container,
+      case ets:lookup(Graph, From) of
+        [] ->
+          ets:insert(Graph, {From, [To]});
+        [{From, ToVertexes}] ->
+          ets:insert(Graph, {From, [To|ToVertexes]})
+      end,
+      Acc
+    end, new(), List),
+  Graph.
