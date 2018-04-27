@@ -11,7 +11,8 @@ all() ->
     add_test,
     multiple_add_test,
     multiple_graphs_test,
-    from_list_test
+    from_list_test,
+    delete_test
   ].
 
 add_test(_Config) ->
@@ -37,3 +38,10 @@ from_list_test(_Config) ->
   List = [{1, 2}, {2, 1}, {2, 3}, {3, 2}, {1, 3}],
   Graph = directed_graph:from_list(List),
   ?assertEqual(lists:sort(List), directed_graph:to_list(Graph)).
+
+delete_test(_Config) ->
+  List = [{1, 2}, {2, 1}, {2, 3}, {3, 2}, {1, 3}],
+  Graph = directed_graph:from_list(List),
+  ?assertEqual(lists:sort(List), directed_graph:to_list(Graph)),
+  directed_graph:delete(Graph),
+  ?assertError(badarg, directed_graph:to_list(Graph)).

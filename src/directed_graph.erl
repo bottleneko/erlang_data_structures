@@ -4,7 +4,8 @@
   new/0,
   add_edge/2,
   to_list/1,
-  from_list/1
+  from_list/1,
+  delete/1
 ]).
 
 -include("data_structures.hrl").
@@ -40,3 +41,6 @@ from_list(List) ->
       Acc
     end, new(), List),
   Graph.
+
+delete(#directred_graph{container = Tid}) ->
+  ets:delete(Tid).
