@@ -3,6 +3,7 @@
 -export([
   new/0,
   add_edge/2,
+  delete_edge/2,
   to_list/1,
   from_list/1,
   delete/1
@@ -19,6 +20,21 @@ add_edge({From, To}, Graph = #directred_graph{container = Tid}) ->
       ets:insert(Tid, {From, [To]});
     [{From, ToVertexes}] ->
       ets:insert(Tid, {From, [To|ToVertexes]})
+  end,
+  Graph.
+
+delete_edge({From, To}, Graph = #directred_graph{container = Tid}) ->
+  case ets:lookup(Tid, From) of
+    [] ->
+      ok;
+    [{From, ToVertexes}] ->
+      NewToVertexes = lists:delete(To, ToVertexes),
+      case NewToVertexes of
+        [] ->
+          ets:delete(Tid, From);
+        List ->
+          ets:insert(Tid, {From, List})
+      end
   end,
   Graph.
 
