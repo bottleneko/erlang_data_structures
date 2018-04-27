@@ -13,9 +13,9 @@
 -include("data_structures.hrl").
 
 new() ->
-  #directred_graph{container = ets:new(directed_graph, [ordered_set])}.
+  #directed_graph{container = ets:new(directed_graph, [ordered_set])}.
 
-add_edge({From, To}, Graph = #directred_graph{container = Tid}) ->
+add_edge({From, To}, Graph = #directed_graph{container = Tid}) ->
   case ets:lookup(Tid, From) of
     [] ->
       ets:insert(Tid, {From, [To]});
@@ -24,7 +24,7 @@ add_edge({From, To}, Graph = #directred_graph{container = Tid}) ->
   end,
   Graph.
 
-delete_edge({From, To}, Graph = #directred_graph{container = Tid}) ->
+delete_edge({From, To}, Graph = #directed_graph{container = Tid}) ->
   case ets:lookup(Tid, From) of
     [] ->
       ok;
@@ -38,7 +38,7 @@ delete_edge({From, To}, Graph = #directred_graph{container = Tid}) ->
   end,
   Graph.
 
-delete_vertex(Vertex, Graph = #directred_graph{container = Tid}) ->
+delete_vertex(Vertex, Graph = #directed_graph{container = Tid}) ->
   ets:delete(Tid, Vertex),
   delete_vertex_T(Vertex, Tid, ets:first(Tid)),
   Graph.
@@ -58,7 +58,7 @@ delete_vertex_T(Vertex, Tid, Key) ->
   delete_vertex_T(Vertex, Tid, ets:next(Tid, Key)).
 
 
-to_list(#directred_graph{container = Tid}) ->
+to_list(#directed_graph{container = Tid}) ->
   lists:flatmap(
     fun({From, To}) ->
       lists:foldl(fun(Elem, Acc) -> [{From, Elem}|Acc] end, [], To)
@@ -67,7 +67,7 @@ to_list(#directred_graph{container = Tid}) ->
 from_list(List) ->
   Graph = lists:foldl(
     fun({From, To}, Acc) ->
-      Graph = Acc#directred_graph.container,
+      Graph = Acc#directed_graph.container,
       case ets:lookup(Graph, From) of
         [] ->
           ets:insert(Graph, {From, [To]});
@@ -78,5 +78,5 @@ from_list(List) ->
     end, new(), List),
   Graph.
 
-delete(#directred_graph{container = Tid}) ->
+delete(#directed_graph{container = Tid}) ->
   ets:delete(Tid).

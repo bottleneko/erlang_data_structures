@@ -11,6 +11,16 @@
   right
 }).
 
--record(directred_graph, {
+-record(directed_graph, {
   container
+}).
+
+-record(directed_weighted_graph, {
+  edge = weighted_edge,
+  container
+}).
+
+-record(weighted_edge, {
+  route,
+  weight
 }).
