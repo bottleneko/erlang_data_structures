@@ -10,6 +10,8 @@ all() ->
   [
     add_edge_test,
     delete_edge_test,
+    delete_vertex_test,
+    delete_not_existing_vertex,
     multiple_add_edge_test,
     multiple_delete_edge_test,
     multiple_graphs_test,
@@ -25,6 +27,34 @@ delete_edge_test(_Config) ->
   Graph = directed_graph:add_edge({1, 2}, directed_graph:new()),
   directed_graph:delete_edge({1, 2}, Graph),
   ?assertEqual([], directed_graph:to_list(Graph)).
+
+delete_vertex_test(_Config) ->
+  ToDeleteVertex = 1,
+  List = [{1, 2}, {2, 1}, {2, 3}, {3, 2}, {1, 3}],
+  FilteredList = lists:filter(
+    fun({From, To}) ->
+      From /= ToDeleteVertex andalso To /= ToDeleteVertex
+    end, List),
+  Graph = lists:foldl(
+    fun(Elem, Acc) ->
+      directed_graph:add_edge(Elem, Acc)
+    end, directed_graph:new(), List),
+  Graph = directed_graph:delete_vertex(ToDeleteVertex, Graph),
+  ?assertEqual(lists:sort(FilteredList), directed_graph:to_list(Graph)).
+
+delete_not_existing_vertex(_Config) ->
+  ToDeleteVertex = 4,
+  List = [{1, 2}, {2, 1}, {2, 3}, {3, 2}, {1, 3}],
+  FilteredList = lists:filter(
+    fun({From, To}) ->
+      From /= ToDeleteVertex andalso To /= ToDeleteVertex
+    end, List),
+  Graph = lists:foldl(
+    fun(Elem, Acc) ->
+      directed_graph:add_edge(Elem, Acc)
+    end, directed_graph:new(), List),
+  Graph = directed_graph:delete_vertex(ToDeleteVertex, Graph),
+  ?assertEqual(lists:sort(FilteredList), directed_graph:to_list(Graph)).
 
 multiple_add_edge_test(_Config) ->
   List = [{1, 2}, {2, 1}, {2, 3}, {3, 2}, {1, 3}],
