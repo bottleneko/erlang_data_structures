@@ -5,14 +5,15 @@
 }).
 
 -record(binary_tree, {
-  size,
   value,
+  size,
   left,
   right
 }).
 
 -record(avl_tree, {
   value,
+  size,
   height,
   left,
   right

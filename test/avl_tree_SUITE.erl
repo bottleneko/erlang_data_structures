@@ -10,7 +10,8 @@ all() ->
   [
     new_identity_test,
     insert_test,
-    extended_insert_test
+    extended_insert_test,
+    size_test
   ].
 
 new_identity_test(_Config) ->
@@ -28,3 +29,10 @@ extended_insert_test(_Config) ->
     end, avl_tree:new(), [1,2,3]),
   ?assertEqual(3, avl_tree:max(Tree)),
   ?assertEqual(1, avl_tree:min(Tree)).
+
+size_test(_Config) ->
+  Tree = lists:foldl(
+    fun(Elem, Acc) ->
+      avl_tree:insert(Elem, Acc)
+    end, avl_tree:new(), [1,2,3,4,5,6]),
+  ?assertEqual(6, avl_tree:size(Tree)).
