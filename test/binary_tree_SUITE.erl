@@ -13,7 +13,7 @@ all() ->
     extended_insert_test,
     minimums_test,
     maximums_test,
-    length_test
+    size_test
   ].
 
 new_identity_test(_Config) ->
@@ -43,7 +43,7 @@ minimums_test(_Config) ->
       Min = binary_tree:min(AccTree),
       NewTree = binary_tree:delete(Min, AccTree),
       {[Min|Acc], NewTree}
-    end, {[], Tree}, lists:seq(1, binary_tree:length(Tree))),
+    end, {[], Tree}, lists:seq(1, binary_tree:size(Tree))),
   ?assertEqual(lists:reverse(lists:sort(List)), SortedList).
 
 maximums_test(_Config) ->
@@ -57,12 +57,12 @@ maximums_test(_Config) ->
       Max = binary_tree:max(AccTree),
       NewTree = binary_tree:delete(Max, AccTree),
       {[Max|Acc], NewTree}
-    end, {[], Tree}, lists:seq(1, binary_tree:length(Tree))),
+    end, {[], Tree}, lists:seq(1, binary_tree:size(Tree))),
   ?assertEqual(lists:sort(List), SortedList).
 
-length_test(_Config) ->
+size_test(_Config) ->
   Tree = lists:foldl(
     fun(Elem, Acc) ->
       binary_tree:insert(Elem, Acc)
     end, binary_tree:new(), [1,2,3]),
-  ?assertEqual(3, binary_tree:length(Tree)).
+  ?assertEqual(3, binary_tree:size(Tree)).

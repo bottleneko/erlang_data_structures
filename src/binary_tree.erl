@@ -16,7 +16,7 @@
   contains/2,
   min/1,
   max/1,
-  length/1,
+  size/1,
   minimums_test/1
 ]).
 
@@ -37,17 +37,17 @@ insert(Element, #binary_tree{size = 0, value = undefined}) ->
     left = ?EMPTY_LEAF,
     right = ?EMPTY_LEAF
   };
-insert(Element, Node = #binary_tree{value = Value}) when Value =:= Element ->
-  Node;
-insert(Element, Node = #binary_tree{size = Size, value = Value, right = Right}) when Value < Element ->
+insert(Element, Tree = #binary_tree{value = Value}) when Value =:= Element ->
+  Tree;
+insert(Element, Tree = #binary_tree{size = Size, value = Value, right = Right}) when Value < Element ->
   NewRight = insert(Element, Right),
-  Node#binary_tree{
+  Tree#binary_tree{
     size = Size - Right#binary_tree.size + NewRight#binary_tree.size,
     right = NewRight
   };
-insert(Element, Node = #binary_tree{size = Size, value = Value, left = Left}) when Value > Element ->
+insert(Element, Tree = #binary_tree{size = Size, value = Value, left = Left}) when Value > Element ->
   NewLeft = insert(Element, Left),
-  Node#binary_tree{
+  Tree#binary_tree{
     size = Size - Left#binary_tree.size + NewLeft#binary_tree.size,
     left = NewLeft
   }.
@@ -67,15 +67,15 @@ delete(Element, #binary_tree{size = Size, value = Value, left = Left, right = Ri
     left = Left,
     right = NewRight
   };
-delete(Element, Node = #binary_tree{size = Size, value = Value, right = Right}) when Value < Element ->
+delete(Element, Tree = #binary_tree{size = Size, value = Value, right = Right}) when Value < Element ->
   NewRight = delete(Element, Right),
-  Node#binary_tree{
+  Tree#binary_tree{
     size = Size - Right#binary_tree.size + NewRight#binary_tree.size,
     right = NewRight
   };
-delete(Element, Node = #binary_tree{size = Size, value = Value, left = Left}) when Value > Element ->
+delete(Element, Tree = #binary_tree{size = Size, value = Value, left = Left}) when Value > Element ->
   NewLeft = delete(Element, Left),
-  Node#binary_tree{
+  Tree#binary_tree{
     size = Size - Left#binary_tree.size + NewLeft#binary_tree.size,
     left = NewLeft
   }.
@@ -103,7 +103,7 @@ max(#binary_tree{value = Value, right = Right}) when
 max(#binary_tree{right = Right}) ->
   max(Right).
 
-length(#binary_tree{size = Size}) ->
+size(#binary_tree{size = Size}) ->
   Size.
 
 
@@ -118,5 +118,5 @@ minimums_test(_Config) ->
       Min = binary_tree:min(AccTree),
       NewTree = binary_tree:delete(Min, AccTree),
       {[Min|Acc], NewTree}
-    end, {[], Tree}, lists:seq(1, binary_tree:length(Tree))),
+    end, {[], Tree}, lists:seq(1, binary_tree:size(Tree))),
   SortedList = lists:reverse(lists:sort(List)) .
