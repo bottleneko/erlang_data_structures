@@ -18,7 +18,8 @@ all() ->
     multiple_delete_edge_test,
     multiple_graphs_test,
     from_list_test,
-    delete_test
+    delete_test,
+    incident_edges_test
   ].
 
 add_edge_test(_Config) ->
@@ -120,3 +121,18 @@ delete_test(_Config) ->
   ?assertEqual(lists:sort(WrappedList), directed_weighted_graph:to_list(Graph)),
   directed_weighted_graph:delete(Graph),
   ?assertError(badarg, directed_weighted_graph:to_list(Graph)).
+
+incident_edges_test(_Config) ->
+  Vertex = 1,
+  List = [{{1, 2}, 1}, {{2, 1}, 1}, {{2, 3}, 1}, {{3, 2}, 1}, {{1, 3}, 1}],
+  Graph = directed_weighted_graph:from_list(List),
+  Incident = lists:filter(
+    fun({{From, To}, _Weight}) ->
+      From =:= Vertex orelse To =:= Vertex
+    end, List),
+  IncidentWrapped = lists:map(
+      fun({Route = {_From, _To}, Weight}) ->
+        #weighted_edge{route = Route, weight = Weight}
+      end, Incident),
+  IncidentEdges = directed_weighted_graph:incident_edges(Vertex, Graph),
+  ?assertEqual(lists:sort(IncidentWrapped), IncidentEdges).

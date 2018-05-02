@@ -7,7 +7,8 @@
   delete_vertex/2,
   to_list/1,
   from_list/1,
-  delete/1
+  delete/1,
+  incident_edges/2
 ]).
 
 -include_lib("stdlib/include/ms_transform.hrl").
@@ -50,3 +51,11 @@ from_list(List) ->
 
 delete(#directed_weighted_graph{container = Tid}) ->
   ets:delete(Tid).
+
+incident_edges(Vertex, #directed_weighted_graph{container = Tid}) ->
+  ets:select(Tid, ets:fun2ms(
+    fun(Edge = #weighted_edge{route = {From, To}}) when
+      From =:= Vertex;
+      To =:= Vertex ->
+      Edge
+    end)).
