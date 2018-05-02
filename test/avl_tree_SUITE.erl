@@ -11,6 +11,8 @@ all() ->
     new_identity_test,
     insert_test,
     extended_insert_test,
+    minimums_test,
+    maximums_test,
     size_test
   ].
 
@@ -29,6 +31,35 @@ extended_insert_test(_Config) ->
     end, avl_tree:new(), [1,2,3]),
   ?assertEqual(3, avl_tree:max(Tree)),
   ?assertEqual(1, avl_tree:min(Tree)).
+
+minimums_test(_Config) ->
+  List = [0,4,5,1,2,3],
+  Tree = lists:foldl(
+    fun(Elem, Acc) ->
+      avl_tree:insert(Elem, Acc)
+    end, avl_tree:new(), List),
+  {SortedList, _} = lists:foldl(
+    fun(_Elem, {Acc, AccTree}) ->
+      Min = avl_tree:min(AccTree),
+      NewTree = avl_tree:delete(Min, AccTree),
+      {[Min|Acc], NewTree}
+    end, {[], Tree}, lists:seq(1, avl_tree:size(Tree))),
+  ?assertEqual(lists:reverse(lists:sort(List)), SortedList).
+
+maximums_test(_Config) ->
+  List = [0,4,5,1,2,3],
+  Tree = lists:foldl(
+    fun(Elem, Acc) ->
+      avl_tree:insert(Elem, Acc)
+    end, avl_tree:new(), List),
+  {SortedList, _} = lists:foldl(
+    fun(_Elem, {Acc, AccTree}) ->
+      Max = avl_tree:max(AccTree),
+      NewTree = avl_tree:delete(Max, AccTree),
+      {[Max|Acc], NewTree}
+    end, {[], Tree}, lists:seq(1, avl_tree:size(Tree))),
+  ?assertEqual(lists:sort(List), SortedList).
+
 
 size_test(_Config) ->
   Tree = lists:foldl(

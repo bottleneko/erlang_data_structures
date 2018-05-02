@@ -5,7 +5,8 @@
   insert/2,
   min/1,
   max/1,
-  size/1
+  size/1,
+  delete/2
 ]).
 
 -include("data_structures.hrl").
@@ -54,6 +55,37 @@ max(#avl_tree{right = Right}) ->
 size(Tree) ->
   safe_size(Tree).
 
+delete(Element, #avl_tree{value = Value, left = undefined, right = undefined}) when Value =:= Element ->
+  undefined;
+delete(Element, #avl_tree{value = Value, left = undefined, right = Right}) when Value =:= Element ->
+  Right;
+delete(Element, #avl_tree{value = Value, left = Left, right = undefined}) when Value =:= Element ->
+  Left;
+delete(Element, #avl_tree{size = Size, value = Value, left = Left, right = Right}) when Value =:= Element ->
+  NewValue = min(Right),
+  NewRight = delete(NewValue, Right),
+  NewTree = #avl_tree{
+    size = Size - 1,
+    value = NewValue,
+    left = Left,
+    right = NewRight
+  },
+  balance(NewTree);
+delete(Element, Tree = #avl_tree{size = Size, value = Value, right = Right}) when Value < Element ->
+  NewRight = delete(Element, Right),
+  NewTree = Tree#avl_tree{
+    size = Size - Right#avl_tree.size + safe_size(NewRight),
+    right = NewRight
+  },
+  balance(NewTree);
+delete(Element, Tree = #avl_tree{size = Size, value = Value, left = Left}) when Value > Element ->
+  NewLeft = delete(Element, Left),
+  NewTree = Tree#avl_tree{
+    size = Size - Left#avl_tree.size + safe_size(NewLeft),
+    left = NewLeft
+  },
+  balance(NewTree).
+
 height(Tree) when is_record(Tree, avl_tree)->
   Tree#avl_tree.height;
 height(undefined) ->
@@ -61,7 +93,6 @@ height(undefined) ->
 
 balance_factor(Tree) ->
   height(Tree#avl_tree.right) - height(Tree#avl_tree.left).
-
 
 fix_height(Tree = #avl_tree{left = undefined, right = undefined}) ->
   Tree#avl_tree{height = 1};
