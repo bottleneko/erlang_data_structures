@@ -11,6 +11,13 @@
   right
 }).
 
+-record(avl_tree, {
+  value,
+  height,
+  left,
+  right
+}).
+
 -record(directed_graph, {
   container
 }).
