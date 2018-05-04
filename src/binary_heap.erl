@@ -46,6 +46,8 @@ insert(Elem, #binary_heap{
     comparator = Comparator},
   sift_up(NewHeap, OldSize).
 
+extract_peek(Heap = #binary_heap{size = 0}) ->
+  {undefined, Heap};
 extract_peek(#binary_heap{
   size = Size,
   container = Container,

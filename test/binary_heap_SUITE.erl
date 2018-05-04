@@ -15,7 +15,8 @@ all() ->
     from_list_test,
     to_list_test,
     size_test,
-    merge_test
+    merge_test,
+    empty_extract_peek_test
   ].
 
 empty_heap_test(_Config) ->
@@ -91,3 +92,9 @@ merge_test(_Config) ->
       {[Min|Acc], NewHeap}
     end, {[], FinalHeap}, lists:seq(1, binary_heap:size(FinalHeap))),
   ?assertEqual(lists:seq(1, 9), lists:reverse(HeapMinimums)).
+
+empty_extract_peek_test(_Config) ->
+  Empty = binary_heap:new(),
+  {Peek, Heap} = binary_heap:extract_peek(Empty),
+  ?assertEqual(undefined, Peek),
+  ?assertEqual(Empty, Heap).
